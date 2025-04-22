@@ -1,17 +1,25 @@
-name: Automated API tests using Postman CLI
+pipeline {
+  agent any
 
-on: push
+  tools {nodejs "{your_nodejs_configured_tool_name}"}
 
-jobs:
-  automated-api-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Postman CLI
-        run: |
-          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
-      - name: Login to Postman CLI
-        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
-      - name: Run API tests
-        run: |
-          postman collection run "35035966-5a9d79ce-1b93-47a2-ba33-531404e62e00"
+  stages {
+    stage('Install Postman CLI') {
+      steps {
+        sh 'curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh'
+      }
+    }
+
+    stage('Postman CLI Login') {
+      steps {
+        sh 'postman login --with-api-key $POSTMAN_API_KEY'
+        }
+    }
+
+    stage('Running collection') {
+      steps {
+        sh 'postman collection run "35035966-5a9d79ce-1b93-47a2-ba33-531404e62e00"'
+      }
+    }
+  }
+}
